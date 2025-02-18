@@ -51,3 +51,5 @@ Accessibility:
 Responsive Design:
 - Optimize the layout for different screen sizes, ensuring usability on desktop, tablet, and mobile devices.
 - Use a flexible grid or stacked layout to enhance the user experience on smaller screens.
+
+- Live link https://verdant-truffle-dbaad1.netlify.app/
