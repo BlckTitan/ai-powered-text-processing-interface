@@ -1,0 +1,26 @@
+ // const languageDetector = async () =>{
+  //   const detector = await languageDetectorInitializer()
+
+  //   // check if language detector is initialized
+  //   if (!detector) {
+  //     console.log("Language detection is not available.");
+  //     return;
+  //   }
+
+  //   const results = await detector.detect(userText);
+
+  //   for (const result of results) {
+  //     // Show the full list of potential languages with their likelihood, ranked
+  //     // from most likely to least likely. In practice, one would pick the top
+  //     // language(s) that cross a high enough threshold.
+  //     // console.log(result.detectedLanguage, );
+  //     console.log(Math.max(result.confidence)*100)
+  //   }
+  //   // (Output truncated):
+  //   // de 0.9993835687637329
+  //   // en 0.00038279531872831285
+  //   // nl 0.00010798392031574622
+  //   // ...
+  // }
+
+  
