@@ -6,6 +6,7 @@ import translateLang from '../libs/translator';
 import languageDetectorInitializer from '../libs/detector'
 import Spinner from '../components/Spinner'
 import summarizeText from '../libs/summarizer';
+import { toast } from 'react-toastify';
 
 export default function TranslatorComponent() {
     
@@ -16,6 +17,7 @@ export default function TranslatorComponent() {
   const [source, setSource] = useState('')
   const [target, setTarget] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
+  const [fullLang, setFullLang] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
 
@@ -85,7 +87,7 @@ export default function TranslatorComponent() {
         setConfidence(bestResult.confidence*100)
         setTranslatedLanguage(bestResult.detectedLanguage)
         setSource(userText)
-
+        getLanguage(bestResult.detectedLanguage)
     }
     
     const summarize = async () =>{
@@ -95,6 +97,25 @@ export default function TranslatorComponent() {
 
     summarize()
 
+    const getLanguage = (lang) =>{
+        const options = [
+            {shortLang: 'en', longLang: "English"},
+            {shortLang:'pt', longLang: "Portuguese"},
+            {shortLang: 'es', longLang: "Spanish"},
+            {shortLang: 'ru', longLang: "Russian"},
+            {shortLang: 'tr', longLang: "Turkish"},
+            {shortLang: 'fr', longLang: "French"},
+        ]
+        
+        options.map((bestResult) => {
+            if(lang === bestResult.shortLang){
+                setFullLang(bestResult.longLang)
+            }
+        })
+    }
+    
+    // const notify = () => toast.success("Wow so easy!", {toastId: 1});
+    // notify()
   return (
     <section 
         className='content w-full h-full md:w-4/12 flex flex-col justify-between border-l border-r p-3'
@@ -142,42 +163,45 @@ export default function TranslatorComponent() {
                     className='mt-6'
                     aria-live='polite'
                 >
-                    {source && `Text is ${translatedLanguage}, I am ${confidence.toFixed(2)}% confident`}
+                    {source && `Text is ${fullLang}, I am ${confidence.toFixed(2)}% confident`}
                 </p>
             </div>
 
             {/* text operations */}
-            <div className='w-full h-fit flex justify-between items-center'>
+            {
+                source &&
+                <div className='w-full h-fit flex justify-between items-center'>
 
                 {/* translate options */}
                 <div>
                     {/* Translated language language */}
-                    <Form.Select 
-                        onClick={(e) => setTarget(e.target.value)}
-                        aria-label='Select language to translate to'
+                        <Form.Select 
+                            onClick={(e) => setTarget(e.target.value)}
+                            aria-label='Select language to translate to'
+                        >
+                            <option aria-label='Translate to' aria-live='polite'>Translate to...</option>
+                            <option value="en" aria-label='English'>English</option>
+                            <option value="pt" aria-label='Portugese'>Portugese</option>
+                            <option value="es" aria-label='Spanish'>Spanish</option>
+                            <option value="ru" aria-label='Russian'>Russian</option>
+                            <option value="tr" aria-label='Turkish'>Turkish</option>
+                            <option value="fr" aria-label='French'>French</option>
+                        </Form.Select>
+                    </div>
+                
+                    {/* Translate button */}
+                    <Button 
+                        type='button'
+                        onClick={translate}
+                        className='text-xl rounded-md bg-blue-500  hover:bg-blue-700 p-2 text-white'aria-label='Translate text'
                     >
-                        <option aria-label='Translate to' aria-live='polite'>Translate to...</option>
-                        <option value="en" aria-label='English'>English</option>
-                        <option value="pt" aria-label='Portugese'>Portugese</option>
-                        <option value="es" aria-label='Spanish'>Spanish</option>
-                        <option value="ru" aria-label='Russian'>Russian</option>
-                        <option value="tr" aria-label='Turkish'>Turkish</option>
-                        <option value="fr" aria-label='French'>French</option>
-                    </Form.Select>
-                </div>
-            
-                {/* Translate button */}
-                <Button 
-                    type='button'
-                    onClick={translate}
-                    className='text-xl rounded-md bg-blue-500  hover:bg-blue-700 p-2 text-white'aria-label='Translate text'
-                >
-                    <span>
-                        Translate
-                    </span>
-                </Button>
+                        <span>
+                            Translate
+                        </span>
+                    </Button>
 
-            </div>
+                </div>
+            }
 
         </div>
 
