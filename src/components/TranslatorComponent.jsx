@@ -1,10 +1,11 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import { Button, Form } from 'react-bootstrap';
-import Spinner from 'react-bootstrap/Spinner';
 import { BsSend } from 'react-icons/bs';
 import translateLang from '../libs/translator';
 import languageDetectorInitializer from '../libs/detector'
+import Spinner from '../components/Spinner'
+import summarizeText from '../libs/summarizer';
 
 export default function TranslatorComponent() {
     
@@ -17,6 +18,8 @@ export default function TranslatorComponent() {
   const [errorMessage, setErrorMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
+
+  const text = 'Butterfield Color® manufactures and distributes a complete line of decorative concrete products. Our concrete coloring, texturing, sealing, staining and stamping products are used in variety of applications, including commercial, residential, institutional development to historic parks, museums and public area renovation projects throughout the US and Canada. Our Uni-Mix®, Perma-Cast®, Select Grade®, Clear Guard®, Elements® and T1000® brand names are synonymous with quality, and are supported by service and technical personnel to ensure high quality installations.'
     //clear error messages
     useEffect(() =>{
         setTimeout(() => {
@@ -42,16 +45,18 @@ export default function TranslatorComponent() {
     
     const translate = async () =>{
 
-        if(target === ''){
+        // check if there is result and set loading status
+        let result = null;
+        if(target === '' || userText === ''){
             return false
         }
 
-        const result = await translateLang(translatedLanguage, target, userText)
+        result = await translateLang(translatedLanguage, target, userText)
         
-        if(!result) return setIsLoading(true)
+        if(result === null) return setIsLoading(true)
 
         setTranslatedText(result)
-        console.log(isLoading)
+        console.log(result, isLoading)
     }
 
     const languageDetector = async () =>{
@@ -82,17 +87,31 @@ export default function TranslatorComponent() {
         setSource(userText)
 
     }
-    console.log(isLoading)
+    
+    const summarize = async () =>{
+        const result = await summarizeText(text)
+        console.log(result)
+    }
+
+    summarize()
+
   return (
-    <section className='content w-full h-full md:w-4/12 flex flex-col justify-between border-l border-r p-3'>
+    <section 
+        className='content w-full h-full md:w-4/12 flex flex-col justify-between border-l border-r p-3'
+        aria-labelledby='translator-title'
+    >
 
         {/* translator content */}
         <div className='max-w-full h-fit'>
 
             <div className='w-full h-fit'>
                 {/*display  text content */}
-                <h2 className='text-semibold text-blue-500'>Text:</h2>
-                <p className='w-full text-left' style={{wordWrap: 'break-word'}}>
+                <h2 className='text-xl text-blue-500'>Text:</h2>
+                <p 
+                    className='w-full text-left' 
+                    style={{wordWrap: 'break-word'}}
+                    aria-live='polite'
+                >
                     {source}
                 </p>
             </div>
@@ -101,24 +120,28 @@ export default function TranslatorComponent() {
                 {/*output  text content */}
                 <div className='w-full h-fit flex justify-between items-center'>
                     
-                    <h2 className='text-semibold text-blue-500'>Output:</h2>
+                    <h2 className='text-xl text-blue-500'>Output:</h2>
 
                     {
-                        (isLoading === true) && 
-                        <span>
-                            Loading...
-                            {/* <Spinner animation="border" variant="primary" className='text-xl' /> */}
-                        </span>
+                        // spinner
+                        (isLoading === true) && <Spinner aria-label='Loading translation...'/>
                     }
 
                 </div>
 
-                <p className='w-full text-left' style={{wordWrap: 'break-word'}}>
+                <p 
+                    className='w-full text-left' 
+                    style={{wordWrap: 'break-word'}}
+                    aria-live='polite'
+                >
                     {translatedText && translatedText}
                 </p>
 
                 {/* detected text language */}
-                <p className='mt-6'>
+                <p 
+                    className='mt-6'
+                    aria-live='polite'
+                >
                     {source && `Text is ${translatedLanguage}, I am ${confidence.toFixed(2)}% confident`}
                 </p>
             </div>
@@ -130,24 +153,26 @@ export default function TranslatorComponent() {
                 <div>
                     {/* Translated language language */}
                     <Form.Select 
-                        aria-label="Default select example"
                         onClick={(e) => setTarget(e.target.value)}
+                        aria-label='Select language to translate to'
                     >
-                        <option>Translate to...</option>
-                        <option value="en">English</option>
-                        <option value="pt">Portugese</option>
-                        <option value="es">Spanish</option>
-                        <option value="ru">Russian</option>
-                        <option value="tr">Turkish</option>
-                        <option value="fr">French</option>
+                        <option aria-label='Translate to' aria-live='polite'>Translate to...</option>
+                        <option value="en" aria-label='English'>English</option>
+                        <option value="pt" aria-label='Portugese'>Portugese</option>
+                        <option value="es" aria-label='Spanish'>Spanish</option>
+                        <option value="ru" aria-label='Russian'>Russian</option>
+                        <option value="tr" aria-label='Turkish'>Turkish</option>
+                        <option value="fr" aria-label='French'>French</option>
                     </Form.Select>
                 </div>
             
+                {/* Translate button */}
                 <Button 
                     type='button'
                     onClick={translate}
+                    className='text-xl rounded-md bg-blue-500  hover:bg-blue-700 p-2 text-white'aria-label='Translate text'
                 >
-                    <span className='text-xl rounded-md bg-blue-500  hover:bg-blue-700 p-2 text-white'>
+                    <span>
                         Translate
                     </span>
                 </Button>
@@ -156,15 +181,13 @@ export default function TranslatorComponent() {
 
         </div>
 
-        <Spinner animation="border" variant="primary" className='text-xl' /> 
-
-        {/* firm input section */}
+        {/* form input section */}
         <div className='w-full h-fit flex justify-center items-end'>
             
             <div className='w-full'>
 
                 {/* form input */}
-                <Form className='flex flex-col justify-between'>
+                <Form className='flex flex-col justify-between' aria-labelledby='input-label'>
 
                     <div>
                         {/* error message */}
@@ -176,7 +199,7 @@ export default function TranslatorComponent() {
                             <Form.Control 
                                 type="text" 
                                 required
-                                className='w-full p-3 text-normal border border-gray-300 rounded-full text-wrap'
+                                className='w-full p-3 text-normal border border-gray-300 !rounded-full text-wrap'
                                 value={userText}
                                 placeholder='Enter text here...'
                                 onChange={(e) => {
@@ -185,11 +208,12 @@ export default function TranslatorComponent() {
                             />
                         </Form.Group>
 
-                        <div className='w-2/12 h-full flex justify-end'>
+                        <div className='w-2/12 ml-2 h-full flex justify-end'>
                             <Button 
                                 type='button' 
-                                className=' rounded-full p-3 bg-borderGreen hover:bg-backgroundGreen '
+                                className='!rounded-full p-3'
                                 onClick={handleValidate}
+                                aria-label='Submit text for traanslation'
                             >
                                 <span className='text-xl text-white'>
                                     <BsSend />

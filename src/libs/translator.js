@@ -12,6 +12,7 @@ const languageTranslatorInitializer = async (source, target) => {
     // check translator status
     if (canTranslate === 'no') {
         // The language translator isn't usable.
+        console.warn('Translator API not available')
         return;
     }
     if (canTranslate === 'readily') {
